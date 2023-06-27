@@ -24,9 +24,8 @@ def signup_ikb() -> types.InlineKeyboardMarkup:
 
 
 def get_contact_kb() -> types.ReplyKeyboardMarkup:
-    return types.ReplyKeyboardMarkup(resize_keyboard=True).add(
+    return types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True).add(
         types.KeyboardButton("Telefon raqamni ulashish 📲", request_contact=True)
     )
-
 
 # , one_time_keyboard=True

@@ -4,5 +4,4 @@ python-dotenv
 uvicorn
 fastapi
 redis
-sqlalchemy
-asyncpg
+motor

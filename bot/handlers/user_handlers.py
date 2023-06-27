@@ -22,7 +22,7 @@ async def share_contact(message: types.Message):
 
     obj = await user_collection.find_one({"_id": message.chat.id})
     if not obj:
-        user = await user_crud.create_user(message.chat.id, "998919791988")
+        user = await user_crud.create_user(message.chat.id, contact.phone_number)
         if not user:
             return await message.answer(
                 text="Siz topskill platformasidan ro'yhatdan o'tmagansiz!\n"
