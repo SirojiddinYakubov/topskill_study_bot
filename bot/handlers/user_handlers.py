@@ -1,6 +1,3 @@
-import logging
-
-import pydantic
 from aiogram import types
 
 from bot.handlers.base_handler import BaseHandler
@@ -38,9 +35,5 @@ class UserHandler(BaseHandler):
         await message.answer("Bot muvaffaqiyatli sozlandi. Endi biz sizga o'quv jarayoni haqida xabarlar yuboramiz 👍",
                              reply_markup=types.ReplyKeyboardRemove())
 
-    async def create_message(self, payload: dict):
-        try:
-            data = MessageSchema(**payload)
-        except pydantic.ValidationError as exc:
-            logging.error(exc.errors())
-            return exc.errors()
+    async def create_message(self, payload: MessageSchema):
+        print(payload)

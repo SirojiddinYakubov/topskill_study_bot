@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from bot.config import settings
 from bot.main import dp, bot, user_handler
+from bot.schemas.message_schemas import MessageSchema
 
 app = FastAPI()
 WEBHOOK_PATH = f"/bot/{settings.TOKEN_API}"
@@ -38,7 +39,7 @@ async def bot_webhook(update: dict):
 
 
 @app.post(f"{WEBHOOK_PATH}/createMessage")
-async def create_message(payload: dict):
+async def create_message(payload: MessageSchema):
     return await user_handler.create_message(payload)
 
 
