@@ -1,16 +1,11 @@
-import asyncio
 import logging
-import os
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from dotenv import load_dotenv
-from datetime import datetime
-
 import aiohttp
 
-# load_dotenv('../.env')
-
+from bot.config import settings
 from bot.db import database
 
 COLLECTION_NAME = 'users'
@@ -18,14 +13,11 @@ COLLECTION_NAME = 'users'
 user_collection = database[COLLECTION_NAME]
 
 
-# print(os.getenv("ADMIN_USERNAME"))
-
-
 async def get_access_token() -> str:
     auth_url = "https://topskill.uz/api/v1/site/auth/jwt/login"
     data = {
-        "username": os.getenv("ADMIN_USERNAME"),
-        "password": os.getenv("ADMIN_PASSWORD"),
+        "username": settings.TOPSKILL_LOGIN,
+        "password": settings.TOPSKILL_PASSWORD,
     }
     access_token = ""
     async with aiohttp.ClientSession(trust_env=True) as client:
@@ -85,11 +77,19 @@ async def create_user(_id: int, phone_number: str):
 async def update_user(_id: int, phone_number: str):
     logging.info(f"Update user: _id: {_id}, phone_number: {phone_number}")
     updated_at = datetime.now()
+
+    user_id = await get_user_id(phone_number)
+
+    if not user_id:
+        return None
+
     result = await user_collection.update_one({"_id": _id}, {"$set": {
         "updated_at": str(updated_at),
-        "phone": phone_number
+        "phone": phone_number,
+        "user_id": user_id,
     }})
 
-    print('updated %s document' % result)
-    new_document = await user_collection.find_one({'_id': _id})
-    print('document is now %s' % new_document)
+    # print('updated %s document' % result)
+    # new_document = await user_collection.find_one({'_id': _id})
+    # print('document is now %s' % new_document)
+    return result

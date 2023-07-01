@@ -1,40 +1,46 @@
-from aiogram import types, Dispatcher
+import logging
 
-from bot.keyboards.user_keyboards import get_main_kb, get_contact_kb, get_start_kb, signup_ikb
+import pydantic
+from aiogram import types
+
+from bot.handlers.base_handler import BaseHandler
+from bot.keyboards.user_keyboards import signup_ikb
+from bot.schemas.message_schemas import MessageSchema
 from crud import user_crud
 from crud.user_crud import user_collection
-from aiogram import Bot
 
 
-async def start_command(message: types.Message):
-    user = await user_collection.find_one({"_id": message.chat.id})
+class UserHandler(BaseHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        """ Register user handlers """
+        self.dp.register_message_handler(self.share_contact, content_types=types.ContentType.CONTACT)
 
-    text = "Assalomu aleykum. Topskill o'quv platformasining botiga xush kelibsiz!"
-    if not (message.contact or user):
-        text += "\n\nPlatforma bilan aloqani yo'lga qo'yish uchun iltimos telefon raqamingizni jo'nating!"
-        await message.answer(text=text, reply_markup=get_contact_kb())
-    else:
-        await message.answer(text=text, reply_markup=get_main_kb())
+    async def share_contact(self, message: types.Message):
+        contact = message.contact
 
+        error_msg = f"Siz ulashilgan telefon raqam bilan topskill platformasidan ro'yhatdan o'tmagansiz!\nIltimos avval {contact} raqam orqali ro'yhatdan o'tib, ana shundan so'ng botni qayta ishga tushiring."
 
-async def share_contact(message: types.Message):
-    contact = message.contact
+        obj = await user_collection.find_one({"_id": message.chat.id})
+        if not obj:
+            user = await user_crud.create_user(message.chat.id, contact.phone_number)
+            if not user:
+                return await message.answer(
+                    text=error_msg,
+                    reply_markup=signup_ikb())
+        else:
+            user = await user_crud.update_user(message.chat.id, contact.phone_number)
+            if not user:
+                return await message.answer(
+                    text=error_msg,
+                    reply_markup=signup_ikb()
+                )
+        await message.answer("Bot muvaffaqiyatli sozlandi. Endi biz sizga o'quv jarayoni haqida xabarlar yuboramiz 👍",
+                             reply_markup=types.ReplyKeyboardRemove())
 
-    obj = await user_collection.find_one({"_id": message.chat.id})
-    if not obj:
-        user = await user_crud.create_user(message.chat.id, contact.phone_number)
-        if not user:
-            return await message.answer(
-                text="Siz topskill platformasidan ro'yhatdan o'tmagansiz!\n"
-                     "Iltimos avval ro'yhatdan o'tib botni qayta ishga tushiring.",
-                reply_markup=signup_ikb())
-    else:
-        await user_crud.update_user(message.chat.id, contact.phone_number)
-    await message.answer("Endi biz sizga o'quv jarayoni haqida xabarlar yuboramiz 👍",
-                         reply_markup=types.ReplyKeyboardRemove())
-
-
-def register_user_handler(dp: Dispatcher, bot: Bot) -> None:
-    """ Register user handlers """
-    dp.register_message_handler(start_command, commands=['start'])
-    dp.register_message_handler(share_contact, content_types=types.ContentType.CONTACT)
+    async def create_message(self, payload: dict):
+        try:
+            data = MessageSchema(**payload)
+        except pydantic.ValidationError as exc:
+            logging.error(exc.errors())
+            return exc.errors()
