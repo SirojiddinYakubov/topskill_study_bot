@@ -1,22 +1,37 @@
-import os
 import pathlib
+from typing import Optional, Any, Union
 
-from aiogram import Dispatcher, Bot
-
-from bot.handlers.user_handlers import register_user_handler
+from pydantic.class_validators import validator
+from pydantic.env_settings import BaseSettings
 
 BASE_DIR = pathlib.Path(__file__).parents[1]
 
-TOKEN_API = f"{os.getenv('BOT_API')}:{os.getenv('BOT_HASH')}"
-REDIS_HOST = os.getenv("REDIS_HOST")
-REDIS_PORT = os.getenv("REDIS_PORT")
 
-bot = Bot(token=TOKEN_API)
-dp = Dispatcher(bot=bot)
+class Settings(BaseSettings):
+    BOT_API: str
+    BOT_HASH: str
+
+    TOKEN_API: Optional[str]
+
+    @validator("TOKEN_API", pre=True, allow_reuse=True)
+    def assemble_token_api(cls, v: Optional[str], values: dict[str, Any]) -> str:
+        return f"{values.get('BOT_API')}:{values.get('BOT_HASH')}"
+
+    REDIS_HOST: str
+    REDIS_PORT: Union[str, int]
+
+    MONGODB_USER: str
+    MONGODB_PASSWORD: str
+    MONGODB_HOST: str
+    MONGODB_PORT: Union[str, int]
+    MONGODB_DATABASE: str
+
+    ADMIN_ID: Union[str, int]
+    TOPSKILL_LOGIN: str
+    TOPSKILL_PASSWORD: str
+
+    class Config:
+        env_file = ".env"
 
 
-def register_handler(dp: Dispatcher, bot: Bot) -> None:
-    register_user_handler(dp, bot)
-
-
-register_handler(dp=dp, bot=bot)
+settings = Settings()

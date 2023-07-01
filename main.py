@@ -1,18 +1,18 @@
 import logging
-from dotenv import load_dotenv
-import uvicorn
-from fastapi import FastAPI
-from aiogram import types, Dispatcher, Bot
-from bot.config import dp, bot, TOKEN_API
 
-load_dotenv('.env')
+import uvicorn
+from aiogram import types, Dispatcher, Bot
+from fastapi import FastAPI
+
+from bot.config import settings
+from bot.main import dp, bot, user_handler
 
 app = FastAPI()
-WEBHOOK_PATH = f"/bot/{TOKEN_API}"
-WEBHOOK_URL = "https://f223-195-158-30-67.ngrok-free.app" + WEBHOOK_PATH
+WEBHOOK_PATH = f"/bot/{settings.TOKEN_API}"
+WEBHOOK_URL = "https://db13-195-158-30-67.ngrok-free.app" + WEBHOOK_PATH
 
 
-# https://api.telegram.org/bot776249055:AAH_Zce3av-IfdDLdscVpapdz6g-ksbtSHw/getwebhookinfo
+# https://api.telegram.org/bot776249055:AAH_Zce3av-IfdDLdscVpapdz6g-ksbtdsrg/getwebhookinfo
 
 @app.on_event("startup")
 async def on_startup():
@@ -35,6 +35,11 @@ async def bot_webhook(update: dict):
     Dispatcher.set_current(dp)
     Bot.set_current(bot)
     await dp.process_update(telegram_update)
+
+
+@app.post(f"{WEBHOOK_PATH}/createMessage")
+async def create_message(payload: dict):
+    return await user_handler.create_message(payload)
 
 
 @app.on_event("shutdown")
