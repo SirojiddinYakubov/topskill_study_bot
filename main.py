@@ -10,7 +10,7 @@ from bot.core import dp, bot, user_handler
 from bot.schemas.message_schemas import GetMessageSchema
 
 app = FastAPI()
-WEBHOOK_PATH = "/"
+WEBHOOK_PATH = "/study-bot/"
 WEBHOOK_URL = settings.WEBHOOK_HOST + WEBHOOK_PATH
 
 
@@ -39,7 +39,7 @@ async def bot_webhook(update: dict):
     await dp.process_update(telegram_update)
 
 
-@app.post("/createMessage")
+@app.post(f"{WEBHOOK_PATH}createMessage")
 async def create_message(payload: GetMessageSchema):
     return await user_handler.create_message(payload)
 
