@@ -12,9 +12,9 @@ class Settings(BaseSettings):
     BOT_API: str
     BOT_HASH: str
 
-    FRONT_BASE_URL: Optional[AnyHttpUrl] = "http://10.12.0.36:8080"
-    BACK_BASE_URL: Optional[AnyHttpUrl] = "http://10.12.0.36:8000"
-    WEBHOOK_HOST: Optional[AnyHttpUrl] = "https://152a-195-158-30-67.ngrok-free.app"
+    FRONT_BASE_URL: Optional[AnyHttpUrl] = "https://topskill.uz"
+    BACK_BASE_URL: Optional[AnyHttpUrl] = "https://topskill.uz"
+    WEBHOOK_HOST: Optional[AnyHttpUrl] = "http://134.209.104.18:8008"
 
     TOKEN_API: Optional[str]
 
