@@ -3,6 +3,7 @@ from typing import Optional, Any, Union
 
 from pydantic.class_validators import validator
 from pydantic.env_settings import BaseSettings
+from pydantic.networks import AnyHttpUrl
 
 BASE_DIR = pathlib.Path(__file__).parents[1]
 
@@ -10,6 +11,10 @@ BASE_DIR = pathlib.Path(__file__).parents[1]
 class Settings(BaseSettings):
     BOT_API: str
     BOT_HASH: str
+
+    FRONT_BASE_URL: Optional[AnyHttpUrl] = "http://10.12.0.36:8080"
+    BACK_BASE_URL: Optional[AnyHttpUrl] = "http://10.12.0.36:8000"
+    WEBHOOK_HOST: Optional[AnyHttpUrl] = "https://152a-195-158-30-67.ngrok-free.app"
 
     TOKEN_API: Optional[str]
 
@@ -27,8 +32,6 @@ class Settings(BaseSettings):
     MONGODB_DATABASE: str
 
     ADMIN_ID: Union[str, int]
-    TOPSKILL_LOGIN: str
-    TOPSKILL_PASSWORD: str
 
     class Config:
         env_file = ".env"

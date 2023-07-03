@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  study_bot:
+    container_name: study_bot
+    build: .
+    image: study_bot_image:latest
+    volumes:
+      - ./:/code
+    ports:
+      - "8008:8008"
+    networks:
+      - bot-network
+    depends_on:
+      - mongo_db
+
+  mongo_db:
+    container_name: mongo_db
+    image: mongo:6-jammy
+    command: mongod --port ${MONGODB_PORT}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - mongo_data:/data/db
+    networks:
+      - bot-network
+volumes:
+  mongo_data:
+    name: mongo_data
+
+networks:
+  bot-network:
+    name: bot-network
