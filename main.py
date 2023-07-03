@@ -1,19 +1,20 @@
 import logging
+import os
 
 import uvicorn
 from aiogram import types, Dispatcher, Bot
 from fastapi import FastAPI
 
 from bot.config import settings
-from bot.main import dp, bot, user_handler
-from bot.schemas.message_schemas import MessageSchema
+from bot.core import dp, bot, user_handler
+from bot.schemas.message_schemas import GetMessageSchema
 
 app = FastAPI()
-WEBHOOK_PATH = f"/bot/{settings.TOKEN_API}"
-WEBHOOK_URL = "https://db13-195-158-30-67.ngrok-free.app" + WEBHOOK_PATH
+WEBHOOK_PATH = "/"
+WEBHOOK_URL = settings.WEBHOOK_HOST + WEBHOOK_PATH
 
 
-# https://api.telegram.org/bot776249055:AAH_Zce3av-IfdDLdscVpapdz6g-ksbtdsrg/getwebhookinfo
+# https://api.telegram.org/bot{TOKEN_API}/getwebhookinfo
 
 @app.on_event("startup")
 async def on_startup():
@@ -22,7 +23,7 @@ async def on_startup():
     await bot.delete_webhook(drop_pending_updates=True)
 
     webhook_info = await bot.get_webhook_info()
-    print(webhook_info)
+    logging.info(webhook_info)
     if webhook_info.url != WEBHOOK_URL:
         await bot.set_webhook(
             url=WEBHOOK_URL
@@ -38,8 +39,8 @@ async def bot_webhook(update: dict):
     await dp.process_update(telegram_update)
 
 
-@app.post(f"{WEBHOOK_PATH}/createMessage")
-async def create_message(payload: MessageSchema):
+@app.post("/createMessage")
+async def create_message(payload: GetMessageSchema):
     return await user_handler.create_message(payload)
 
 
@@ -51,4 +52,8 @@ async def on_shutdown():
 
 
 if __name__ == '__main__':
-    uvicorn.run("__main__:app", host="0.0.0.0", port=8080, reload=True, workers=4, log_config='log.ini')
+    try:
+        uvicorn.run("__main__:app", host="0.0.0.0", port=8008, reload=True, workers=4, log_config='log.ini')
+    except FileNotFoundError:
+        os.mkdir('logs')
+        open('logs/debug.log', 'a').close()

@@ -1,4 +1,8 @@
 from aiogram import types
+from pydantic.networks import AnyHttpUrl
+
+from bot.config import settings
+from bot.schemas.message_schemas import HomeworkStatusEnum
 
 
 def get_main_kb() -> types.ReplyKeyboardMarkup:
@@ -19,7 +23,7 @@ def get_start_kb() -> types.ReplyKeyboardMarkup:
 
 def signup_ikb() -> types.InlineKeyboardMarkup:
     return types.InlineKeyboardMarkup(inline_keyboard=[
-        [types.InlineKeyboardButton(text="Ro'yhatdan o'tish", url="https://topskill.uz/auth/signup")]
+        [types.InlineKeyboardButton(text="Ro'yhatdan o'tish", url=f"{settings.FRONT_BASE_URL}/auth/signup")]
     ])
 
 
@@ -28,4 +32,22 @@ def get_contact_kb() -> types.ReplyKeyboardMarkup:
         types.KeyboardButton("Telefon raqamni ulashish 📲", request_contact=True)
     )
 
+
 # , one_time_keyboard=True
+
+
+def redirect_to_hw_kb(status: HomeworkStatusEnum, callback_url: AnyHttpUrl):
+    if status == HomeworkStatusEnum.WAITING:
+        return types.InlineKeyboardMarkup(inline_keyboard=[
+            [
+                types.InlineKeyboardButton("Amaliy ishni tekshirish ->", url=callback_url)
+            ]
+        ])
+    elif status == HomeworkStatusEnum.ACCEPTED or status == HomeworkStatusEnum.REJECTED:
+        return types.InlineKeyboardMarkup(inline_keyboard=[
+            [
+                types.InlineKeyboardButton("Kurator izohini o'qish ->", url=callback_url)
+            ]
+        ])
+    else:
+        return None

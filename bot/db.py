@@ -4,6 +4,7 @@ from bot.config import settings
 
 cluster = motor_asyncio.AsyncIOMotorClient(
     "mongodb://{user}:{password}@{host}:{port}/{database}?retryWrites=true&w=majority".format(
+        # "mongodb://{host}:{port}/{database}?retryWrites=true&w=majority".format(
         user=settings.MONGODB_USER,
         password=settings.MONGODB_PASSWORD,
         host=settings.MONGODB_HOST,

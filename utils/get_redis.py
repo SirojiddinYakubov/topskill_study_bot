@@ -1,11 +1,11 @@
 import redis
 
-from bot.config import REDIS_HOST, REDIS_PORT
+from bot.config import settings
 
 
 def get_redis_client() -> redis.Redis:
     redis_client = redis.from_url(
-        f"redis://{REDIS_HOST}:{REDIS_PORT}",
+        f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}",
         max_connections=10,
         encoding="utf8",
         decode_responses=True,
