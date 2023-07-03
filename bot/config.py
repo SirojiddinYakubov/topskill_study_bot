@@ -14,7 +14,7 @@ class Settings(BaseSettings):
 
     FRONT_BASE_URL: Optional[AnyHttpUrl] = "https://topskill.uz"
     BACK_BASE_URL: Optional[AnyHttpUrl] = "https://topskill.uz"
-    WEBHOOK_HOST: Optional[AnyHttpUrl] = "http://134.209.104.18:8008"
+    WEBHOOK_HOST: Optional[AnyHttpUrl] = "https://topskill.uz/study-bot"
 
     TOKEN_API: Optional[str]
 
