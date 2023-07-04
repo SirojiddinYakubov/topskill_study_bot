@@ -17,20 +17,24 @@ class UserHandler(BaseHandler):
 
     async def share_contact(self, message: types.Message):
         contact = message.contact
+        phone = contact.phone_number
 
-        error_msg = f"Siz ulashilgan telefon raqam bilan topskill platformasidan ro'yhatdan o'tmagansiz!\nIltimos avval {contact.phone_number} raqam orqali ro'yhatdan o'tib, ana shundan so'ng botni qayta ishga tushiring."
+        if "+" in phone:
+            phone = phone.replace("+", "")
+
+        error_msg = f"Siz ulashilgan telefon raqam bilan topskill platformasidan ro'yhatdan o'tmagansiz!\nIltimos avval {phone} raqam orqali ro'yhatdan o'tib, ana shundan so'ng botni qayta ishga tushiring."
 
         obj = await user_collection.find_one({"_id": message.chat.id})
         if not obj:
-            user = await user_crud.create_user(message.chat.id, contact.phone_number)
+            user = await user_crud.create_user(message.chat.id, phone)
             if not user:
                 return await message.answer(
                     text=error_msg,
                     reply_markup=signup_ikb())
 
-            await self.bot.send_message(settings.ADMIN_ID, f"New user with phone {contact.phone_number} connected.")
+            await self.bot.send_message(settings.ADMIN_ID, f"New user with phone {phone} connected.")
         else:
-            user = await user_crud.update_user(message.chat.id, contact.phone_number)
+            user = await user_crud.update_user(message.chat.id, phone)
             if not user:
                 return await message.answer(
                     text=error_msg,

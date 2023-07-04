@@ -15,6 +15,7 @@ print(13, database)
 user_collection = database[COLLECTION_NAME]
 print(16, user_collection)
 
+
 # async def get_access_token() -> str:
 #     auth_url = "https://topskill.uz/api/v1/site/auth/jwt/login"
 #     data = {
@@ -80,6 +81,3 @@ async def update_user(_id: int, phone_number: str):
     # new_document = await user_collection.find_one({'_id': _id})
     # print('document is now %s' % new_document)
     return result
-
-
-
