@@ -4,6 +4,7 @@ services:
     container_name: study_bot
     build: .
     image: study_bot_image:latest
+    restart: always
     volumes:
       - ./:/code
     ports:
@@ -16,6 +17,7 @@ services:
   mongo_db:
     container_name: mongo_db
     image: mongo:6-jammy
+    restart: always
     command: mongod --port ${MONGODB_PORT}
     ports:
       - "${MONGODB_PORT}:${MONGODB_PORT}"
