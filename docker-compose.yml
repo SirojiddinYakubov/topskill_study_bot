@@ -17,6 +17,8 @@ services:
     container_name: mongo_db
     image: mongo:6-jammy
     command: mongod --port ${MONGODB_PORT}
+    ports:
+      - "${MONGODB_PORT}:${MONGODB_PORT}"
     environment:
       TZ: "Asia/Tashkent"
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
